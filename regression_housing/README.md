@@ -1,4 +1,4 @@
-# Practice-Regression-Clustering-House-Prices-Customer-Segmentation
+# Practice-Regression-House-Prices
 
 dataset used:
 https://www.kaggle.com/datasets/yasserh/housing-prices-dataset?resource=download
