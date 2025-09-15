@@ -134,20 +134,61 @@ print(f"MSE: {mse:.2f}")
 print(f"RMSE: {rmse:.2f}")
 print(f"R²: {r2:.4f}")
 
-# # -----------------------------
-# # 8 OLS Regression Summary
-# # -----------------------------
-import statsmodels.api as sm
+# # # -----------------------------
+# # # 8 OLS Regression Summary
+# # # -----------------------------
+# import statsmodels.api as sm
 
-# Assume df is your DataFrame
-X = df[["area", "bedrooms", "bathrooms", "stories", "parking"]]
-y = df["price"]
+# # Assume df is your DataFrame
+# X = df[["area", "bedrooms", "bathrooms", "stories", "parking"]]
+# y = df["price"]
 
-# Add intercept
-X = sm.add_constant(X)
+# # Add intercept
+# X = sm.add_constant(X)
 
-# Fit model
-model = sm.OLS(y, X).fit()
+# # Fit model
+# model = sm.OLS(y, X).fit()
 
-# Summary
-print(model.summary())
+# # Summary
+# print(model.summary())
+
+# -----------------------------
+# Day 3: Random Forest Regression + Feature Importance
+# -----------------------------
+y_pred_lr = lr.predict(X_test_vif)
+mse_lr = mean_squared_error(y_test, y_pred_lr)
+rmse_lr = np.sqrt(mse_lr)
+r2_lr = r2_score(y_test, y_pred_lr)
+
+
+from sklearn.ensemble import RandomForestRegressor
+import matplotlib.pyplot as plt
+
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+rf.fit(X_train_vif, y_train)
+y_pred_rf = rf.predict(X_test_vif)
+
+mse_rf = mean_squared_error(y_test, y_pred_rf)
+rmse_rf = np.sqrt(mse_rf)
+r2_rf = r2_score(y_test, y_pred_rf)
+
+# =============================
+# Model Comparison
+# =============================
+results = pd.DataFrame({
+    "Model": ["Linear Regression", "Random Forest"],
+    "MSE": [mse_lr, mse_rf],
+    "RMSE": [rmse_lr, rmse_rf],
+    "R²": [r2_lr, r2_rf]
+})
+print("\n=== Model Comparison ===")
+print(results)
+
+# Feature importance (Random Forest)
+importances = rf.feature_importances_
+indices = np.argsort(importances)[-10:]  # Top 10
+plt.barh(range(len(indices)), importances[indices])
+plt.yticks(range(len(indices)), [X_train_vif.columns[i] for i in indices])
+plt.xlabel("Feature Importance")
+plt.title("Top 10 Important Features (Random Forest)")
+plt.show()
