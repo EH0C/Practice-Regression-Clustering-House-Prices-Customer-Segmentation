@@ -74,62 +74,80 @@ X_test_scaled = scaler.transform(X_test)
 X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns)
 X_test_scaled = pd.DataFrame(X_test_scaled, columns=X_test.columns)
 
-# # -----------------------------
-# # 4. Multicollinearity check (VIF) with auto-drop
-# # -----------------------------
-# def calculate_vif(X):
-#     vif_data = pd.DataFrame()
-#     vif_data["Feature"] = X.columns
-#     vif_data["VIF"] = [
-#         variance_inflation_factor(X.values, i) for i in range(X.shape[1])
-#     ]
-#     return vif_data.sort_values(by="VIF", ascending=False)
+# -----------------------------
+# 4. Multicollinearity check (VIF) with auto-drop
+# -----------------------------
+def calculate_vif(X):
+    vif_data = pd.DataFrame()
+    vif_data["Feature"] = X.columns
+    vif_data["VIF"] = [
+        variance_inflation_factor(X.values, i) for i in range(X.shape[1])
+    ]
+    return vif_data.sort_values(by="VIF", ascending=False)
 
-# def drop_high_vif(X, threshold=10):
-#     dropped = []
-#     while True:
-#         vif_df = calculate_vif(X)
-#         max_vif = vif_df["VIF"].max()
-#         if max_vif > threshold:
-#             drop_feature = vif_df.loc[vif_df["VIF"].idxmax(), "Feature"]
-#             print(f"Dropping '{drop_feature}' (VIF={max_vif:.2f})")
-#             dropped.append(drop_feature)
-#             X = X.drop(columns=[drop_feature])
-#         else:
-#             break
-#     return X, vif_df, dropped
+def drop_high_vif(X, threshold=10):
+    dropped = []
+    while True:
+        vif_df = calculate_vif(X)
+        max_vif = vif_df["VIF"].max()
+        if max_vif > threshold:
+            drop_feature = vif_df.loc[vif_df["VIF"].idxmax(), "Feature"]
+            print(f"Dropping '{drop_feature}' (VIF={max_vif:.2f})")
+            dropped.append(drop_feature)
+            X = X.drop(columns=[drop_feature])
+        else:
+            break
+    return X, vif_df, dropped
 
-# X_train_vif, final_vif, dropped_features = drop_high_vif(X_train_scaled, threshold=10)
-# X_test_vif = X_test_scaled[X_train_vif.columns]  # keep same features
+X_train_vif, final_vif, dropped_features = drop_high_vif(X_train_scaled, threshold=10)
+X_test_vif = X_test_scaled[X_train_vif.columns]  # keep same features
 
 # # -----------------------------
 # # 5. Show feature summary
 # # -----------------------------
-# print("\n=== Dropped Features (VIF > 10) ===")
-# print(dropped_features if dropped_features else "None")
+print("\n=== Dropped Features (VIF > 10) ===")
+print(dropped_features if dropped_features else "None")
 
-# print("\n=== Final Features Kept ===")
-# print(list(X_train_vif.columns))
+print("\n=== Final Features Kept ===")
+print(list(X_train_vif.columns))
 
-# print("\n=== Final VIF values ===")
-# print(final_vif)
+print("\n=== Final VIF values ===")
+print(final_vif)
 
 # # -----------------------------
 # # 6. Train Linear Regression
 # # -----------------------------
-# lr = LinearRegression()
-# lr.fit(X_train_vif, y_train)
+lr = LinearRegression()
+lr.fit(X_train_vif, y_train)
 
 # # -----------------------------
 # # 7. Predictions & Evaluation
 # # -----------------------------
-# y_pred = lr.predict(X_test_vif)
+y_pred = lr.predict(X_test_vif)
 
-# mse = mean_squared_error(y_test, y_pred)
-# rmse = np.sqrt(mse)
-# r2 = r2_score(y_test, y_pred)
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
 
-# print("\n=== Model Performance ===")
-# print(f"MSE: {mse:.2f}")
-# print(f"RMSE: {rmse:.2f}")
-# print(f"R²: {r2:.4f}")
+print("\n=== Model Performance ===")
+print(f"MSE: {mse:.2f}")
+print(f"RMSE: {rmse:.2f}")
+print(f"R²: {r2:.4f}")
+
+# # -----------------------------
+# # 8 OLS Regression Summary
+# # -----------------------------
+import statsmodels.api as sm
+
+# Assume df is your DataFrame
+X = df[["area", "bedrooms", "bathrooms", "stories", "parking"]]
+y = df["price"]
+
+# Add intercept
+X = sm.add_constant(X)
+
+# Fit model
+model = sm.OLS(y, X).fit()
+
+# Summary
+print(model.summary())
