@@ -66,3 +66,19 @@ R² = 0.6529
 Coefficient of Determination: about 65% of the variance in house prices is explained by your features.
 
 Not bad for a simple Linear Regression model 👌.
+
+Insights:
+
+Linear Regression actually outperforms Random Forest here — which is a bit unusual, since Random Forest often handles nonlinearities and interactions better.
+
+Your R² is higher (0.65 vs 0.61).
+
+Your errors (MSE, RMSE) are lower.
+
+Possible reasons Random Forest didn’t shine:
+
+Dataset might be relatively small, and Random Forest could be overfitting.
+
+Features could have mostly linear relationships with the target.
+
+Random Forest hyperparameters might need tuning (e.g., n_estimators, max_depth, min_samples_split).
